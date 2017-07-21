@@ -2,13 +2,16 @@ arch ?= x86_64
 kernel := build/kernel-$(arch).bin
 iso := build/os-$(arch).iso
 
+target ?= $(arch)-mini_os
+rust_os := target/$(target)/debug/libmini_os.a
+
 linker_script := src/arch/$(arch)/linker.ld
 grub_cfg := src/arch/$(arch)/grub.cfg
 assembly_source_files := $(wildcard src/arch/$(arch)/*.asm)
 assembly_object_files := $(patsubst src/arch/$(arch)/%.asm, \
 	build/arch/$(arch)/%.o, $(assembly_source_files))
 
-.PHONY: all clean run iso
+.PHONY: all clean run iso kernel
 
 all: $(kernel)
 
@@ -29,8 +32,12 @@ $(iso): $(kernel) $(grub_cfg)
 	@rm -r build/isofiles
 
 # /usr/local/x86_64elfgcc/bin/x86_64-elf-ld : x86_64elfgcc linker
-$(kernel): $(assembly_object_files) $(linker_script)
-	@/usr/local/x86_64elfgcc/bin/x86_64-elf-ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files)
+$(kernel): kernel $(rust_os) $(assembly_object_files) $(linker_script)
+	@/usr/local/x86_64elfgcc/bin/x86_64-elf-ld -n -T $(linker_script) -o $(kernel) \
+		$(assembly_object_files) $(rust_os)
+
+kernel:
+	@xargo build --target $(target)
 
 # compile assembly files
 
