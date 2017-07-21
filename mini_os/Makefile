@@ -33,7 +33,7 @@ $(iso): $(kernel) $(grub_cfg)
 
 # /usr/local/x86_64elfgcc/bin/x86_64-elf-ld : x86_64elfgcc linker
 $(kernel): kernel $(rust_os) $(assembly_object_files) $(linker_script)
-	@/usr/local/x86_64elfgcc/bin/x86_64-elf-ld -n -T $(linker_script) -o $(kernel) \
+	@/usr/local/x86_64elfgcc/bin/x86_64-elf-ld -n --gc-sections -T $(linker_script) -o $(kernel) \
 		$(assembly_object_files) $(rust_os)
 
 kernel:
