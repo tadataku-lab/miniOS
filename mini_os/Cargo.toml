@@ -1,0 +1,9 @@
+[package]
+name = "mini_os"
+version = "0.1.0"
+authors = ["shonanking"]
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
