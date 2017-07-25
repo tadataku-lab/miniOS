@@ -1,7 +1,8 @@
 use core::ptr::Unique;
-use volatile::Volatile;
-use core::fmt;
 use core::fmt::Write;
+use core::fmt;
+use volatile::Volatile;
+use spin::Mutex;
 
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
@@ -44,7 +45,27 @@ impl Writer {
         unsafe{ self.buffer.as_mut() }
     }
 
-    fn new_line(&mut self) {/* TODO */}
+    fn new_line(&mut self) {
+        for row in 1..BUFFER_HEIGHT {
+            for col in 0..BUFFER_WIDTH {
+                let buffer = self.buffer();
+                let character = buffer.chars[row][col].read();
+                buffer.chars[row - 1][col].write(character);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1);
+        self.column_position = 0;
+    }
+
+    fn clear_row(&mut self, row: usize) {
+        let blank = ScreenChar {
+            ascii_character: b' ',
+            color_code: self.color_code,
+        };
+        for col in 0..BUFFER_WIDTH {
+            self.buffer().chars[row][col].write(blank)
+        }
+    }
 
     pub fn write_str(&mut self, s: &str) {
         for byte in s.bytes() {
@@ -97,6 +118,12 @@ const BUFFER_WIDTH: usize = 80;
 struct Buffer {
     chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
+
+pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
+    column_position: 0,
+    color_code: ColorCode::new(Color::LightGreen, Color::Black),
+    buffer: unsafe { Unique::new(0xb8000 as *mut _)}
+});
 
 pub fn print_something() {
     let mut writer = Writer {
