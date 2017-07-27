@@ -1,3 +1,4 @@
+pub use self::paging::test_paging;
 pub mod area_frame_allocator;
 pub mod paging;
 

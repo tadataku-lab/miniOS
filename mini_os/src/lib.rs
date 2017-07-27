@@ -13,6 +13,7 @@ extern crate rlibc;
 extern crate volatile;
 extern crate spin;
 extern crate multiboot2;
+extern crate x86_64;
 
 #[macro_use]
 extern crate bitflags;
@@ -50,6 +51,8 @@ pub extern fn rust_main(multiboot_information_address: usize) {
         multiboot_end, memory_map_tag.memory_areas()
     );
 
+    memory::test_paging(&mut frame_allocator);
+
     println!("{:?}", frame_allocator.allocate_frame() );
 
     for i in 0.. {
@@ -58,7 +61,6 @@ pub extern fn rust_main(multiboot_information_address: usize) {
             break;
         }
     }
-
 
     loop{}
 }
