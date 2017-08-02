@@ -19,7 +19,7 @@ extern crate x86_64;
 extern crate bitflags;
 
 #[no_mangle]
-pub extern fn rust_main(multiboot_information_address: usize) {
+pub extern "C" fn rust_main(multiboot_information_address: usize) {
     vga_buffer::clear_screen();
     println!("Hello World{}", "!");
     
@@ -51,6 +51,7 @@ pub extern fn rust_main(multiboot_information_address: usize) {
         multiboot_end, memory_map_tag.memory_areas()
     );
 
+    /*
     memory::test_paging(&mut frame_allocator);
 
     println!("{:?}", frame_allocator.allocate_frame() );
@@ -61,7 +62,11 @@ pub extern fn rust_main(multiboot_information_address: usize) {
             break;
         }
     }
+    */
 
+    memory::remap_the_kernel(&mut frame_allocator, boot_info);
+    println!("It did not crash!");
+    
     loop{}
 }
 
