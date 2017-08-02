@@ -64,11 +64,28 @@ pub extern "C" fn rust_main(multiboot_information_address: usize) {
     }
     */
 
+    enable_nxe_bit();
+    enable_write_protect_bit();
     memory::remap_the_kernel(&mut frame_allocator, boot_info);
     frame_allocator.allocate_frame(); // new: try to allocate a frame
     println!("It did not crash!");
 
     loop{}
+}
+
+fn enable_write_protect_bit() {
+    use x86_64::registers::control_regs::{cr0, cr0_write, Cr0};
+    unsafe { cr0_write(cr0() | Cr0::WRITE_PROTECT) };
+}
+
+fn enable_nxe_bit() {
+    use x86_64::registers::msr::{IA32_EFER, rdmsr, wrmsr};
+
+    let nxe_bit = 1 << 11;
+    unsafe {
+        let efer = rdmsr(IA32_EFER);
+        wrmsr(IA32_EFER, efer | nxe_bit);
+    }
 }
 
 #[lang = "eh_personality"] extern fn eh_personality() {}
