@@ -1,0 +1,1 @@
+{"rustc":17353966002887111912,"features":"[]","target":1491228175785592150,"profile":731176819336294830,"deps":[["spin v0.4.5",4854928531191957111]],"local":[{"MtimeBased":[[1501773033,0],"/Users/shonanking/miniOS/mini_os/target/debug/.fingerprint/bump_allocator-ac666c591d14c91a/dep-lib-bump_allocator-ac666c591d14c91a"]}],"rustflags":[]}
