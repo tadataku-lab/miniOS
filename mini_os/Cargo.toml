@@ -14,9 +14,14 @@ multiboot2 = "0.1.0"
 bitflags = "0.7.0"
 x86_64 = "0.1.2"
 once = "0.3.2"
+bit_field = "0.7.0"
 
 [dependencies.bump_allocator]
 path = "libs/bump_allocator"
 
 [dependencies.hole_list_allocator]
 path = "libs/hole_list_allocator"
+
+[dependencies.lazy_static]
+version = "0.2.4"
+features = ["spin_no_std"]

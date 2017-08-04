@@ -13,7 +13,7 @@ mod mapper;
 use self::temporary_page::TemporaryPage;
 
 pub use self::mapper::Mapper;
-use core::ops::{Deref, DerefMut};
+use core::ops::{Deref, DerefMut, Add};
 
 use multiboot2::BootInformation;
 
@@ -90,6 +90,14 @@ pub struct Page {
    number: usize,
 }
 
+impl Add<usize> for Page {
+    type Output = Page;
+
+    fn add(self, rhs: usize) -> Page {
+        Page { number: self.number + rhs }
+    }
+}
+
 impl Page {
     pub fn containing_address(address: VirtualAddress) -> Page {
         assert!(address < 0x0000_8000_0000_0000 ||
@@ -98,7 +106,7 @@ impl Page {
         Page { number: address / PAGE_SIZE }
     }
 
-    fn start_address(&self) -> usize {
+    pub fn start_address(&self) -> usize {
         self.number * PAGE_SIZE
     }
 
@@ -123,6 +131,7 @@ impl Page {
     }
 }
 
+#[derive(Clone)]
 pub struct PageIter {
     start: Page,
     end: Page,

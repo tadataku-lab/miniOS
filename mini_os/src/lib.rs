@@ -3,6 +3,7 @@
 #![no_std]
 #![feature(const_fn)]
 #![feature(alloc)]
+#![feature(abi_x86_interrupt)]
 
 #[macro_use]
 mod vga_buffer;
@@ -10,11 +11,14 @@ mod vga_buffer;
 mod memory;
 use memory::FrameAllocator;
 
+mod interrupts;
+
 extern crate rlibc;
 extern crate volatile;
 extern crate spin;
 extern crate multiboot2;
 extern crate x86_64;
+extern crate bit_field;
 
 #[macro_use]
 extern crate once;
@@ -27,6 +31,9 @@ extern crate alloc;
 #[macro_use]
 extern crate bitflags;
 
+#[macro_use]
+extern crate lazy_static;
+
 
 #[no_mangle]
 pub extern "C" fn rust_main(multiboot_information_address: usize) {
@@ -38,10 +45,28 @@ pub extern "C" fn rust_main(multiboot_information_address: usize) {
     enable_nxe_bit();
     enable_write_protect_bit();
 
-    memory::init(boot_info);
+    let mut memory_controller = memory::init(boot_info);
 
+    // initialize our IDT
+    interrupts::init(&mut memory_controller);
+
+    // invoke a breakpoint exception
+    //x86_64::instructions::interrupts::int3();
+
+    /*
+    unsafe {
+        *(0xdeadbeaf as *mut u64) = 42;
+    };
+    */
+    
+    fn stack_overflow() {
+        stack_overflow();
+    }
+
+    stack_overflow();
+    
     println!("It did not crash!");
-
+    /*
     use alloc::boxed::Box;
     let mut heap_test = Box::new(42);
     *heap_test -= 15;
@@ -52,10 +77,6 @@ pub extern "C" fn rust_main(multiboot_information_address: usize) {
     vec_test[3] = 42;
     for i in &vec_test {
         print!("{} ", i);
-    }
-    /*
-    for i in 0..10000 {
-        format!("Some String");
     }
     */
     loop{}
