@@ -17,3 +17,6 @@ once = "0.3.2"
 
 [dependencies.bump_allocator]
 path = "libs/bump_allocator"
+
+[dependencies.hole_list_allocator]
+path = "libs/hole_list_allocator"

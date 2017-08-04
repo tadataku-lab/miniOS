@@ -19,7 +19,8 @@ extern crate x86_64;
 #[macro_use]
 extern crate once;
 
-extern crate bump_allocator;
+//extern crate bump_allocator;
+extern crate hole_list_allocator;
 #[macro_use]
 extern crate alloc;
 
@@ -52,7 +53,11 @@ pub extern "C" fn rust_main(multiboot_information_address: usize) {
     for i in &vec_test {
         print!("{} ", i);
     }
-
+    /*
+    for i in 0..10000 {
+        format!("Some String");
+    }
+    */
     loop{}
 }
 
